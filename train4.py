@@ -79,7 +79,7 @@ class BoxClassNet(nn.Module):
         #
         self.bbox = nn.Sequential(
             nn.Flatten(),                          # GAP output is B×2048×1×1
-            nn.Linear(feat_dim, 6),
+            nn.Linear(feat_dim, 48),
             nn.Sigmoid()
         )
         self.cls  = nn.Sequential(
@@ -93,8 +93,23 @@ class BoxClassNet(nn.Module):
     def forward(self,x,targets=None, save=True):
         feat1 = self.backbone(x) 
         boxes = self.bbox(feat1)
-        boxes = boxes.reshape(x.shape[0], 3,2)   # or x.view(2, 8)
-        x_m, mask  = mask_polygon(img=x,vertices= boxes, return_mask=True)          
+        boxes = boxes.reshape(8,x.shape[0], 3,2)   # or x.view(2, 8)
+        # Define each masked image and corresponding mask
+        x_m1, mask1 = mask_polygon(img=x, vertices=boxes[0], return_mask=True)
+        x_m2, mask2 = mask_polygon(img=x, vertices=boxes[1], return_mask=True)
+        x_m3, mask3 = mask_polygon(img=x, vertices=boxes[2], return_mask=True)
+        x_m4, mask4 = mask_polygon(img=x, vertices=boxes[3], return_mask=True)
+        x_m5, mask5 = mask_polygon(img=x, vertices=boxes[4], return_mask=True)
+        x_m6, mask6 = mask_polygon(img=x, vertices=boxes[5], return_mask=True)
+        x_m7, mask7 = mask_polygon(img=x, vertices=boxes[6], return_mask=True)
+        x_m8, mask8 = mask_polygon(img=x, vertices=boxes[7], return_mask=True)
+
+        # Sum (accumulate) all masked images
+        x_m = x_m1 + x_m2 + x_m3 + x_m4 + x_m5 + x_m6 + x_m7 + x_m8
+
+        # Sum (accumulate) all masks
+        mask = mask1 + mask2 + mask3 + mask4 + mask5 + mask6 + mask7 + mask8
+
         logits= self.cls(self.backbone(x_m) )
         if save:
                 save_image(x_m, 'batch_output_croped.png', nrow=8, padding=2, normalize=True)                        # masked image

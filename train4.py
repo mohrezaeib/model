@@ -48,15 +48,15 @@ def soft_box_mask(boxes, H=IMG_SZ, W=IMG_SZ, k=SOFT_K):
     return left*right*top*bottom   # (B,1,H,W)
 
 # ---------------------  MODEL PARTS ---------------------------
-def build_bbox_head():
-    m = torchvision.models.resnet18(weights='IMAGENET1K_V1')
-    m.fc = nn.Sequential(nn.Linear(m.fc.in_features,16), nn.Sigmoid())
-    return m
+# def build_bbox_head():
+#     m = torchvision.models.resnet18(weights='IMAGENET1K_V1')
+#     m.fc = nn.Sequential(nn.Linear(m.fc.in_features,16), nn.Sigmoid())
+#     return m
 
-def build_class_head():
-    m = torchvision.models.resnet50(weights='IMAGENET1K_V1')
-    m.fc = nn.Linear(m.fc.in_features, NUM_CLS)
-    return m
+# def build_class_head():
+#     m = torchvision.models.resnet50(weights='IMAGENET1K_V1')
+#     m.fc = nn.Linear(m.fc.in_features, NUM_CLS)
+#     return m
 
 class BoxClassNet(nn.Module):
     def __init__(self, lam=LAMBDA, mu=0.5, sigma=0.5):
@@ -65,12 +65,21 @@ class BoxClassNet(nn.Module):
         backbone = torchvision.models.resnet50(weights='IMAGENET1K_V1')
         self.backbone = nn.Sequential(*list(backbone.children())[:-1])  # upto GAP
         feat_dim = 2048
+
+        # -------------------------------------------------
+        # 1) Freeze the backbone weights and BN statistics
+        # -------------------------------------------------
+        for p in self.backbone.parameters():
+            p.requires_grad = False          # no gradient
+
+        self.backbone.eval()                 # no BN running-stat updates
+        # (we will call it under torch.no_grad() in forward())
         #
         # 2. heads
         #
         self.bbox = nn.Sequential(
             nn.Flatten(),                          # GAP output is B×2048×1×1
-            nn.Linear(feat_dim, 14),
+            nn.Linear(feat_dim, 6),
             nn.Sigmoid()
         )
         self.cls  = nn.Sequential(
@@ -84,11 +93,9 @@ class BoxClassNet(nn.Module):
     def forward(self,x,targets=None, save=True):
         feat1 = self.backbone(x) 
         boxes = self.bbox(feat1)
-        boxes = boxes.reshape(x.shape[0], 7,2)   # or x.view(2, 8)
+        boxes = boxes.reshape(x.shape[0], 3,2)   # or x.view(2, 8)
         x_m, mask  = mask_polygon(img=x,vertices= boxes, return_mask=True)          
-        feat2 = self.backbone(x_m) 
-        logits= self.cls(feat2)
-        logits2= self.cls(feat1)
+        logits= self.cls(self.backbone(x_m) )
         if save:
                 save_image(x_m, 'batch_output_croped.png', nrow=8, padding=2, normalize=True)                        # masked image
                 save_image(x, 'batch_output_original.png', nrow=8, padding=2, normalize=True)      
@@ -98,9 +105,9 @@ class BoxClassNet(nn.Module):
             return logits, x_m, mask
   
         ce = F.cross_entropy(logits,targets)
-        ce3 = F.cross_entropy(logits2,targets)
         area = area_from_mask(mask)
-        loss=ce+ce3 + 1/(area * (1 - area)) + (area)
+        loss=ce + (area)*(area)
+        #1/((1 - area)) + 1/((area))+
         #print(f"box loss {boxloss}, ce loss{ce}, area {area}")
         return loss,logits,x_m, mask
 
@@ -200,8 +207,12 @@ def evaluate(model,loader):
 def main():
     torch.manual_seed(0)
     net = BoxClassNet().to(DEVICE)
-    opt = torch.optim.AdamW(net.parameters(),lr=LR,weight_decay=1e-4)
-    sched= torch.optim.lr_scheduler.CosineAnnealingLR(opt,T_max=EPOCHS)
+
+    opt = torch.optim.Adam(           # or SGD, etc.
+            filter(lambda p: p.requires_grad, net.parameters()),
+            lr = LR)
+
+    sched = torch.optim.lr_scheduler.StepLR(opt, step_size=10, gamma=0.1)
 
     for ep in range(1,EPOCHS+1):
         t0=time.time(); run=0

@@ -1,0 +1,6 @@
+! *.py
+coco
+data
+demo_out
+*.pyc
+*.pth

@@ -1,0 +1,40 @@
+Image 0:
+  Ground Truth  : ['pottedplant']
+  Predicted (0.5): ['person']
+  Mask Area      : 0.04
+
+Image 1:
+  Ground Truth  : ['bird']
+  Predicted (0.5): []
+  Mask Area      : 0.01
+
+Image 2:
+  Ground Truth  : ['sheep']
+  Predicted (0.5): []
+  Mask Area      : 0.06
+
+Image 3:
+  Ground Truth  : ['bird']
+  Predicted (0.5): []
+  Mask Area      : 0.00
+
+Image 4:
+  Ground Truth  : ['bottle', 'person']
+  Predicted (0.5): ['person']
+  Mask Area      : 0.18
+
+Image 5:
+  Ground Truth  : ['train']
+  Predicted (0.5): []
+  Mask Area      : 0.06
+
+Image 6:
+  Ground Truth  : ['car', 'horse', 'person']
+  Predicted (0.5): []
+  Mask Area      : 0.14
+
+Image 7:
+  Ground Truth  : ['bird']
+  Predicted (0.5): []
+  Mask Area      : 0.01
+

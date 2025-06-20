@@ -1,0 +1,40 @@
+Image 0:
+  Ground Truth  : ['tvmonitor']
+  Predicted (0.5): []
+  Mask Area      : 0.15
+
+Image 1:
+  Ground Truth  : ['person', 'train']
+  Predicted (0.5): []
+  Mask Area      : 0.24
+
+Image 2:
+  Ground Truth  : ['boat']
+  Predicted (0.5): ['person']
+  Mask Area      : 0.34
+
+Image 3:
+  Ground Truth  : ['cow']
+  Predicted (0.5): []
+  Mask Area      : 0.41
+
+Image 4:
+  Ground Truth  : ['tvmonitor']
+  Predicted (0.5): []
+  Mask Area      : 0.08
+
+Image 5:
+  Ground Truth  : ['aeroplane']
+  Predicted (0.5): []
+  Mask Area      : 0.52
+
+Image 6:
+  Ground Truth  : ['dog', 'person']
+  Predicted (0.5): []
+  Mask Area      : 0.24
+
+Image 7:
+  Ground Truth  : ['car']
+  Predicted (0.5): []
+  Mask Area      : 0.54
+

@@ -1,0 +1,40 @@
+Image 0:
+  Ground Truth  : ['person']
+  Predicted (0.5): ['person']
+  Mask Area      : 0.52
+
+Image 1:
+  Ground Truth  : ['bicycle']
+  Predicted (0.5): ['bicycle']
+  Mask Area      : 0.70
+
+Image 2:
+  Ground Truth  : ['boat']
+  Predicted (0.5): ['boat']
+  Mask Area      : 0.58
+
+Image 3:
+  Ground Truth  : ['person']
+  Predicted (0.5): ['person']
+  Mask Area      : 0.37
+
+Image 4:
+  Ground Truth  : ['horse']
+  Predicted (0.5): ['sheep']
+  Mask Area      : 0.65
+
+Image 5:
+  Ground Truth  : ['train']
+  Predicted (0.5): ['train']
+  Mask Area      : 0.68
+
+Image 6:
+  Ground Truth  : ['chair', 'person']
+  Predicted (0.5): ['person']
+  Mask Area      : 0.63
+
+Image 7:
+  Ground Truth  : ['horse']
+  Predicted (0.5): []
+  Mask Area      : 0.69
+

@@ -1,0 +1,40 @@
+Image 0:
+  Ground Truth  : ['person', 'pottedplant']
+  Predicted (0.5): []
+  Mask Area      : 0.03
+
+Image 1:
+  Ground Truth  : ['chair', 'tvmonitor']
+  Predicted (0.5): []
+  Mask Area      : 0.01
+
+Image 2:
+  Ground Truth  : ['dog', 'motorbike']
+  Predicted (0.5): []
+  Mask Area      : 0.03
+
+Image 3:
+  Ground Truth  : ['motorbike', 'person']
+  Predicted (0.5): []
+  Mask Area      : 0.01
+
+Image 4:
+  Ground Truth  : ['sofa']
+  Predicted (0.5): []
+  Mask Area      : 0.05
+
+Image 5:
+  Ground Truth  : ['car']
+  Predicted (0.5): []
+  Mask Area      : 0.03
+
+Image 6:
+  Ground Truth  : ['chair', 'diningtable']
+  Predicted (0.5): []
+  Mask Area      : 0.01
+
+Image 7:
+  Ground Truth  : ['bottle', 'car', 'dog', 'person']
+  Predicted (0.5): []
+  Mask Area      : 0.04
+

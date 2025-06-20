@@ -10,11 +10,10 @@ from utils import *
 BATCH      = 32
 EPOCHS     = 30
 LR         = 3e-4
-LAMBDA     = 1e+0       # area-penalty weight
+LAMBDA     = 1e-1       # area-penalty weight
 DEVICE     = 'cuda' if torch.cuda.is_available() else 'cpu'
 # Set N_BOX to the number of polygons you want per image:
-N_BOX = 1   # e.g. 2 polygons per image
-N_EDGE = 4   # e.g. triangle, rectangular, etc
+N_BOX = 20   # e.g. 2 circle per image
 
 # --------------------  MODEL  ----------------------
 class BoxClassNet(nn.Module):
@@ -28,11 +27,14 @@ class BoxClassNet(nn.Module):
 
         feat_dim = 2048
         # For each requested polygon, we need N_EDGE corners × 2 coords 
-        self.bbox_head = nn.Sequential(
-            nn.Flatten(),
-            nn.Linear(feat_dim, N_BOX * N_EDGE*2),
-            nn.Sigmoid()
-        )
+        self.circle_heads = nn.ModuleList([
+            nn.Sequential(
+                nn.Flatten(),
+                nn.Linear(feat_dim, 3),
+                nn.Sigmoid()
+            )
+            for _ in range(N_BOX)
+        ])
         self.cls_head = nn.Sequential(
             nn.Flatten(),
             nn.Linear(feat_dim, NUM_CLS)
@@ -43,22 +45,21 @@ class BoxClassNet(nn.Module):
         with torch.no_grad():
             feat = self.backbone(x)
 
-        # Predicted boxes: shape (B, N_BOX, 3, 2)
-        boxes = self.bbox_head(feat).view(x.size(0), N_BOX, N_EDGE, 2)
+        # Flatten once, feed into each circle head
+        feat_flat = feat.view(feat.size(0), -1)
+        circles = []
+        for head in self.circle_heads:
+            c_i = head(feat_flat)  # shape (B,3)
+            circles.append(c_i)
+        # Combine them into (B, N_BOX, 3)
+        circles = torch.stack(circles, dim=1)
 
-        # -------------------------------------------------
-        # Combine multiple polygons into a single “union” mask
-        # -------------------------------------------------
+        # Union of all predicted circles
         combined_mask = None
         for i in range(N_BOX):
-            # Get mask from the i-th polygon
-            _, m_i = mask_polygon(img=x, vertices=boxes[:, i], return_mask=True)
-            if combined_mask is None:
-                combined_mask = m_i
-            else:
-                # Pixelwise max --> union of all polygons
-                combined_mask = torch.maximum(combined_mask, m_i)
-
+            # This line does NOT change
+            _, m_i = mask_circle(img=x, circle=circles[:, i], return_mask=True)
+            combined_mask = m_i if combined_mask is None else torch.maximum(combined_mask, m_i)
         # Apply the combined mask once
         x_masked = x * combined_mask
         area = area_from_mask(combined_mask)  # (B,)
@@ -102,9 +103,10 @@ def main():
               f'f1 {f1:5.2f}  '
               f'area {avg_area:5.2f} '
               f'{(time.time()-t0):.1f}s')
-        run_validation_snapshots(net, val_ld, ep, output_dir="./triangle01")
+        run_validation_snapshots(net, val_ld, ep, output_dir="./circle_independent_20head")
 
     torch.save(net.state_dict(), 'box_class_net.pth')
 
 if __name__ == '__main__':
     main()
+

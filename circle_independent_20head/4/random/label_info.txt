@@ -1,0 +1,40 @@
+Image 0:
+  Ground Truth  : ['dog', 'person']
+  Predicted (0.5): []
+  Mask Area      : 0.41
+
+Image 1:
+  Ground Truth  : ['dog', 'person']
+  Predicted (0.5): ['dog']
+  Mask Area      : 0.45
+
+Image 2:
+  Ground Truth  : ['diningtable', 'person']
+  Predicted (0.5): ['person']
+  Mask Area      : 0.55
+
+Image 3:
+  Ground Truth  : ['bird']
+  Predicted (0.5): []
+  Mask Area      : 0.36
+
+Image 4:
+  Ground Truth  : ['cat']
+  Predicted (0.5): ['cat']
+  Mask Area      : 0.67
+
+Image 5:
+  Ground Truth  : ['bird']
+  Predicted (0.5): []
+  Mask Area      : 0.44
+
+Image 6:
+  Ground Truth  : ['chair', 'person', 'sofa']
+  Predicted (0.5): ['person']
+  Mask Area      : 0.40
+
+Image 7:
+  Ground Truth  : ['chair', 'pottedplant', 'sofa', 'tvmonitor']
+  Predicted (0.5): []
+  Mask Area      : 0.32
+
